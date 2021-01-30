@@ -1,10 +1,25 @@
 <template>
   <div id="app">
-    
-    <router-view/>
+    <keep-alive include="Home">
+      <router-view></router-view>
+    </keep-alive>
+    <tab-bar-main
+      v-show="$route.path==='/home' ||$route.path==='/cart'||$route.path==='/categroy'||$route.path==='/profile'"
+    ></tab-bar-main>
   </div>
 </template>
+<script>
+import TabBarMain from "components/common/tabbar/TabBarMain";
 
-<style lang="less">
+export default {
+  name: "App",
+  components: {
+    TabBarMain
+  },
+  created() {}
+};
+</script>
 
+<style lang="less" scoped>
+@import "assets/css/base.css";
 </style>

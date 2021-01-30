@@ -1,0 +1,18 @@
+@import '~assets/css/normalize.css';
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  /* 解决多次点击报错 */
+  touch-action: pan-y;
+}
+
+
+
+img{
+  vertical-align: middle;
+}
+
+body{
+  background-color: #eaeaea;
+}
