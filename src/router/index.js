@@ -10,6 +10,7 @@ const Profile = () => import('views/Profile')
 const Categroy = () => import('views/Categroy')
 const BannerView = () => import('views/BannerView')
 const GoodsView = () => import('views/GoodsView')
+const FenleiView = ()=>import('views/FenleiView')
 
 const routes = [
   {
@@ -51,11 +52,19 @@ const routes = [
     meta: {
       title: '想你所想'
     }
-  }, {
+  }, 
+  {
     path: '/goods/:good_id',
     component: GoodsView,
     meta: {
       title: '恭喜发财'
+    }
+  },
+  {
+    path:'/fenleiview',
+    component:FenleiView,
+    meta:{
+      title:'不过也是'
     }
   }
 ]

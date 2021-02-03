@@ -36,9 +36,13 @@
       <!-- 分类导航 -->
       <categroy-bar color="green" bgc="white">
         <template>
-          <categroy-bar-item v-for="(item,index) in categroyBar.categroyBarData" :key="index">
+          <categroy-bar-item
+            v-for="(item,index) in categroyBar.categroyBarData"
+            :key="index"
+            @click.native="categroyClick(item.id)"
+          >
             <template #img>
-              <img v-lazy="item.img" alt @load="categroyLoad"   />
+              <img v-lazy="item.img" alt @load="categroyLoad" />
             </template>
             <template #text>
               <p>{{item.text}}</p>
@@ -98,7 +102,7 @@ import GoodsView from "components/common/goodsview/GoodsView";
 import GoodsViewItem from "components/common/goodsview/GoodsViewItem";
 import BetterScrollView from "components/common/scrollview/BetterScrollView";
 
-import {goTop} from "common/mixin"
+import { goTop } from "common/mixin";
 
 // 防抖
 import { debounce } from "common/util";
@@ -111,7 +115,8 @@ export default {
         bannerData: []
       },
       categroyBar: {
-        categroyBarData: []
+        categroyBarData: [],
+        index: 0
       },
       categroyBarBase: {
         categroyBarBaseData: []
@@ -123,7 +128,7 @@ export default {
       },
       // 默认选择的categroybase
       curgoodcategroy: "item1",
-      curgoodcategroyIndex:0,
+      curgoodcategroyIndex: 0,
       // 回到顶部按钮show
       isTop: false,
       // 防抖函数包装后的函数
@@ -138,7 +143,7 @@ export default {
     };
   },
   // 混入(属性整合)
-  mixins:[goTop],
+  mixins: [goTop],
   methods: {
     // 轮播图item跳转
     jump(index) {
@@ -159,15 +164,15 @@ export default {
       //baseitem上拉时不受控制
       this.$refs.catebase2.activeIndex = index;
       this.$refs.catebase1.activeIndex = index;
-      this.curgoodcategroyIndex=index;
+      this.curgoodcategroyIndex = index;
     },
     // 回到顶部
-    
+
     // 监听better-scroll滚动
     contentScroll(option) {
       // console.log(option);
       // 回到顶部按钮显示或隐藏
-     this.showTop(option.y,-100)
+      this.showTop(option.y, -100);
       // categroybase1是否显示(假装吸顶)
       option.y <= -this.catebaseOffsetTop
         ? (this.catebaseisShow = true)
@@ -246,11 +251,19 @@ export default {
     // 跳转至商品详情页
     itemC(item) {
       this.$router.push({
-        path:`goods/${item.id}`,
-        query:{
-          categroy_base_id:this.curgoodcategroyIndex+1
+        path: `goods/${item.id}`,
+        query: {
+          categroy_base_id:item.categroy_base_id
         }
       });
+    },
+    //
+    categroyClick(index) {
+      // console.log(index);
+      //
+      this.categroyBar.index = index;
+
+      this.$router.push("/fenleiview");
     }
   },
   components: {
@@ -260,8 +273,7 @@ export default {
     CategroyBarBase,
     GoodsView,
     GoodsViewItem,
-    BetterScrollView,
-   
+    BetterScrollView
   },
   created() {
     this.request({
@@ -293,6 +305,18 @@ export default {
   deactivated() {
     // 记录离开前的位置
     this.scrollY = this.$refs.scroll.bs.y;
+    // 解决第一次发送监听不到的问题
+    this.$nextTick(() => {
+      this.$bus.$emit(
+        "categroyClick",
+        this.categroyBar.categroyBarData,
+        this.categroyBar.index
+      );
+    });
+
+    // 在$on之前关掉，解决触发越来越多的问题(keep-alive包裹时在deactivated，
+    // 一般在销毁前后调用)
+    this.$bus.$off("categroyClick");
   }
 };
 </script>
@@ -329,8 +353,6 @@ export default {
   bottom: 51px;
   overflow: hidden;
 }
-
-
 
 .categroy-bar-base {
   position: relative;

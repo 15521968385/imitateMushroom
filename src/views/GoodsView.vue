@@ -30,14 +30,7 @@
     >
       <template>
         <!-- swiper -->
-        <van-swipe
-          class="my-swipe"
-          
-          :loop="false"
-          indicator-color="white"
-          lazy-render
-          ref="swipe"
-        >
+        <van-swipe class="my-swipe" :loop="false" indicator-color="white" lazy-render ref="swipe">
           <van-swipe-item v-for="(item,index) in goods.banner" :key="index">
             <img :src="item.img" @load="bannerImgLoad" />
           </van-swipe-item>
@@ -53,7 +46,8 @@
         </van-cell>
         <!-- 规格弹出层控制 -->
         <van-cell class="guige-cell" is-link @click="goods.guigeShow=true">
-          <p>请选择：颜色 尺码</p>
+          <p v-if="goods.color.length!=0">请选择：颜色 尺码</p>
+          <p v-else>请选择：规格</p>
         </van-cell>
 
         <!-- 评论弹出层控制 -->
@@ -76,7 +70,12 @@
         <!-- 推荐 -->
         <goods-com :column="3" class="goods_com" ref="tuiJian">
           <template>
-            <goods-com-item v-for="item in goods.tuijian" :key="item.id" class="goods_com_item">
+            <goods-com-item
+              v-for="item in goods.tuijian"
+              :key="item.id"
+              class="goods_com_item"
+              @click.native="itemC(item)"
+            >
               <template #gimg>
                 <img :src="item.img" @load="tuijianImgLoad" alt />
               </template>
@@ -108,7 +107,7 @@
         <p>销量：{{curGood.xiaoliang}}件</p>
         <p>已选择：{{curGoodStr}}</p>
       </div>
-      <div class="content">
+      <div class="content" v-if="goods.color.length!=0">
         <p class="title">颜色</p>
         <p>
           <span
@@ -119,7 +118,7 @@
           >{{item.color}}</span>
         </p>
       </div>
-      <div class="content">
+      <div class="content" v-if="goods.size.length!=0">
         <p class="title">尺码</p>
         <p>
           <span
@@ -130,6 +129,18 @@
           >{{item.size}}</span>
         </p>
       </div>
+      <div class="content" v-if="goods.guige.length!=0">
+        <p class="title">规格</p>
+        <p>
+          <span
+            v-for="(item,index) in goods.guige"
+            :key="item.id"
+            :class="{'cur-color':index==goods.curGuige}"
+            @click="goods.curGuige=index"
+          >{{item.title}}</span>
+        </p>
+      </div>
+
       <div class="content">
         <p class="title">数量</p>
         <van-stepper v-model="goods.curNum" />
@@ -182,10 +193,13 @@ export default {
         curColor: 0,
         size: [],
         curSize: 0,
+        guige: [],
+        curGuige: 0,
         curNum: 1,
         pinglunCategroy: [],
         pinglun: [],
         canshu: [],
+
         tuijian: []
       },
       swipe: {
@@ -211,20 +225,35 @@ export default {
   computed: {
     curGood() {
       // 注意转成对象
-      return Object(this.goods.color[this.goods.curColor]);
+      if (this.goods.color.length != 0) {
+        return Object(this.goods.color[this.goods.curColor]);
+      } else {
+        return Object(this.goods.guige[this.goods.curGuige]);
+      }
     },
     curGoodStr() {
-      return (
-        Object(this.goods.color[this.goods.curColor]).color +
-        "/" +
-        Object(this.goods.size[this.goods.curSize]).size
-      );
+      if (this.goods.color.length != 0) {
+        return (
+          Object(this.goods.color[this.goods.curColor]).color +
+          "/" +
+          Object(this.goods.size[this.goods.curSize]).size
+        );
+      } else {
+        return Object(this.goods.guige[this.goods.curGuige]).title;
+      }
     },
     xiaoliang() {
       let xiaoliang = 0;
-      for (let item of this.goods.color) {
-        xiaoliang += item.xiaoliang;
+      if (this.goods.color.length != 0) {
+        for (let item of this.goods.color) {
+          xiaoliang += item.xiaoliang;
+        }
+      } else {
+        for (let item of this.goods.guige) {
+          xiaoliang += item.xiaoliang;
+        }
       }
+
       return xiaoliang;
     },
     pinglunCategroyLength(categroy_id) {
@@ -236,9 +265,39 @@ export default {
     },
     zhePirce() {
       return this.goods.baseInfo.price * this.goods.baseInfo.discount * 0.1;
-    }
+    },
+    
   },
   methods: {
+    getData() {
+      this.request({
+        url: "/querygooddata",
+        method: "get",
+        params: {
+          good_id: this.$route.params.good_id,
+          categroybase_id: this.$route.query.categroy_base_id
+        }
+      }).then(
+        res => {
+          // console.log(res);
+          this.goods.banner = res.banner;
+          this.goods.baseInfo = res.baseinfo[0];
+          this.goods.service = res.service;
+          this.goods.color = res.color;
+          this.goods.size = res.size;
+          this.goods.pinglunCategroy = res.pinglun_categroy;
+
+          this.goods.pinglun = res.pinglun;
+
+          this.goods.canshu = res.canshu;
+          this.goods.tuijian = res.tuijian;
+          this.goods.guige = res.guige;
+        },
+        err => {
+          throw err;
+        }
+      );
+    },
     navItemClick(index) {
       this.nav.curCenterText = index;
       if (this.nav.curCenterText === 0) {
@@ -306,7 +365,19 @@ export default {
     showImgLoad() {
       this.canshu.offsetTop = this.$refs.canShu.$el.offsetTop;
       this.tuijian.offsetTop = this.$refs.tuiJian.$el.offsetTop;
-    }
+    },
+    itemC(item) {
+      this.$router.replace({
+        path: `/goods/${item.id}`,
+        query: {
+          categroy_base_id: item.categroy_base_id
+        }
+      });
+      this.getData();
+      this.$refs.scroll.go(0,0,1)
+
+    },
+    
   },
 
   components: {
@@ -320,32 +391,7 @@ export default {
     GoodsComItem
   },
   created() {
-    this.request({
-      url: "/querygooddata",
-      method: "get",
-      params: {
-        good_id: this.$route.params.good_id,
-        categroybase_id: this.$route.query.categroy_base_id
-      }
-    }).then(
-      res => {
-        // console.log(res.canshu);
-        this.goods.banner = res.banner;
-        this.goods.baseInfo = res.baseinfo[0];
-        this.goods.service = res.service;
-        this.goods.color = res.color;
-        this.goods.size = res.size;
-        this.goods.pinglunCategroy = res.pinglun_categroy;
-
-        this.goods.pinglun = res.pinglun;
-
-        this.goods.canshu = res.canshu;
-        this.goods.tuijian = res.tuijian;
-      },
-      err => {
-        throw err;
-      }
-    );
+    this.getData()
   },
   mounted() {
     // // $refs元素一般到mounted生命周期函数中拿
@@ -397,14 +443,12 @@ export default {
   .van-swipe-item {
     color: #fff;
     font-size: 20px;
-    
+
     display: flex;
     justify-content: center;
-    
+
     img {
       width: 80%;
-     
-      
     }
   }
 }

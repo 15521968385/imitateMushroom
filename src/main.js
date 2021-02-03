@@ -13,7 +13,7 @@ Vue.prototype.$bus = new Vue()
 //vant-ui
 import {
   Button, Icon, Swipe, SwipeItem, Sticky, Popup, Cell, Stepper, GoodsAction, GoodsActionIcon, GoodsActionButton, Card,
-  Checkbox, Toast, SwipeCell, SubmitBar
+  Checkbox, Toast, SwipeCell, SubmitBar,Loading,Tab,Tabs,Search
 } from 'vant';
 Vue.use(Button);
 Vue.use(Icon);
@@ -31,6 +31,10 @@ Vue.use(Checkbox);
 Vue.use(Toast)
 Vue.use(SwipeCell)
 Vue.use(SubmitBar)
+Vue.use(Loading);
+Vue.use(Tab);
+Vue.use(Tabs);
+Vue.use(Search);
 
 //全局过滤器
 Vue.filter('priceFilter', function (priceStr) {
