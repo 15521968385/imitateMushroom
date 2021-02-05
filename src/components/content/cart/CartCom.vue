@@ -1,6 +1,6 @@
 <template>
   <div class="cartcom">
-    <div class="cart_box" v-for="(item) in cartData" :key="item.id" :style="{backgroundColor:bgc}">
+    <div class="cart_box" v-for="(item) in cartData" :key="item.id" :style="{backgroundColor:bgc}" @click="itemC(item)">
       <div class="l">
         <van-checkbox v-model="item.checked" @click="checkClcik(item.id)"></van-checkbox>
       </div>
@@ -120,7 +120,17 @@ export default {
           throw err;
         }
       );
-    }
+    },
+    itemC(item) {
+      this.$router.push({
+        path: `goods/${item.goods_id}`,
+        query: {
+          categroy_base_id:item.categroy_base_id,
+          
+        }
+      });
+
+    },
   }
 };
 </script>

@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <keep-alive include="Home,FenleiView">
+    <keep-alive include="Home,FenleiView,Categroy">
       <router-view></router-view>
     </keep-alive>
     <tab-bar-main
@@ -22,4 +22,5 @@ export default {
 
 <style lang="less" scoped>
 @import "assets/css/base.css";
+
 </style>

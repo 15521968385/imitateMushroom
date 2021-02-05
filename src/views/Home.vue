@@ -253,7 +253,8 @@ export default {
       this.$router.push({
         path: `goods/${item.id}`,
         query: {
-          categroy_base_id:item.categroy_base_id
+          categroy_base_id:item.categroy_base_id,
+          
         }
       });
     },

@@ -69,7 +69,8 @@ export default {
       this.$router.push({
         path: `goods/${item.id}`,
         query: {
-          categroy_base_id: item.categroy_base_id
+          categroy_base_id:item.categroy_base_id,
+          
         }
       });
 
@@ -125,7 +126,12 @@ export default {
 <style lang="less" scoped>
 .fenleiviwe {
   padding-top: 44px;
+  
+  
 }
+.fenleiviwe::-webkit-scrollbar {
+    display: none; /* Chrome Safari */
+  }
 .center_box {
   position: relative;
   .search_icon {

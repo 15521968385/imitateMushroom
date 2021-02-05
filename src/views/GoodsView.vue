@@ -19,6 +19,9 @@
           >{{item}}</span>
         </div>
       </template>
+      <template #right>
+        <go-cart></go-cart>
+      </template>
     </nav-bar>
     <!-- scroll -->
     <better-scroll-view
@@ -171,6 +174,7 @@ import ImgShow from "components/content/goodsview/ImgShow";
 import CanShu from "components/content/goodsview/CanShu";
 import GoodsCom from "components/common/goodsview/GoodsView";
 import GoodsComItem from "components/common/goodsview/GoodsViewItem";
+import GoCart from "components/common/gocart/GoCart"
 import { goTop } from "common/mixin";
 
 // 防抖
@@ -275,7 +279,8 @@ export default {
         method: "get",
         params: {
           good_id: this.$route.params.good_id,
-          categroybase_id: this.$route.query.categroy_base_id
+          categroybase_id: this.$route.query.categroy_base_id,
+          
         }
       }).then(
         res => {
@@ -345,13 +350,15 @@ export default {
         url: "/addcart",
         method: "post",
         data: {
+          
           name: this.goods.baseInfo.gname,
           select: this.curGoodStr,
           price: this.zhePirce,
           num: this.goods.curNum,
           img: this.curGood.img,
           checked: 1,
-          goods_id: this.goods.baseInfo.id
+          goods_id: this.goods.baseInfo.id,
+          categroy_base_id:this.goods.baseInfo.categroy_base_id
         }
       }).then(
         res => {
@@ -370,7 +377,8 @@ export default {
       this.$router.replace({
         path: `/goods/${item.id}`,
         query: {
-          categroy_base_id: item.categroy_base_id
+          categroy_base_id: item.categroy_base_id,
+          
         }
       });
       this.getData();
@@ -388,7 +396,8 @@ export default {
     ImgShow,
     CanShu,
     GoodsCom,
-    GoodsComItem
+    GoodsComItem,
+    GoCart
   },
   created() {
     this.getData()
