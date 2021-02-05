@@ -20,7 +20,7 @@
               <p>{{item.gname}}</p>
             </template>
             <template #price>
-              <span>{{item.price|priceFilter}}</span>
+              <span>{{item.prices|priceFilter}}</span>
             </template>
             <template #zan>
               <span>{{item.zan}}</span>
